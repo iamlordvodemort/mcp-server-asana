@@ -47,6 +47,9 @@ import {
   getStoriesForTaskTool,
   createTaskStoryTool
 } from './tools/story-tools.js';
+import {
+  addTaskToSectionTool
+} from './tools/section-tools.js';
 
 // List of all available tools
 const all_tools: Tool[] = [
@@ -83,6 +86,7 @@ const all_tools: Tool[] = [
   addProjectToTaskTool,
   removeProjectFromTaskTool,
   deleteTaskTool,
+  addTaskToSectionTool,
 ];
 
 // List of tools that only read Asana state
@@ -557,6 +561,15 @@ export function tool_handler(asanaClient: AsanaClientWrapper): (request: CallToo
           const { task_id } = args;
           await asanaClient.deleteTask(task_id);
           const message = `Successfully deleted task ${task_id}`;
+          return {
+            content: [{ type: "text", text: message }],
+          };
+        }
+
+        case "asana_add_task_to_section": {
+          const { section_gid, task_gid, insert_before, insert_after } = args;
+          await asanaClient.addTaskToSection(section_gid, task_gid, insert_before, insert_after);
+          const message = `Successfully moved task ${task_gid} to section ${section_gid}`;
           return {
             content: [{ type: "text", text: message }],
           };

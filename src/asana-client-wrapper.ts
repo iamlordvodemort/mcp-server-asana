@@ -8,6 +8,7 @@ export class AsanaClientWrapper {
   private projectStatuses: any;
   private tags: any;
   private customFieldSettings: any;
+  private sections: any;
 
   constructor(token: string) {
     const client = Asana.ApiClient.instance;
@@ -21,6 +22,7 @@ export class AsanaClientWrapper {
     this.projectStatuses = new Asana.ProjectStatusesApi();
     this.tags = new Asana.TagsApi();
     this.customFieldSettings = new Asana.CustomFieldSettingsApi();
+    this.sections = new Asana.SectionsApi();
   }
 
   async listWorkspaces(opts: any = {}) {
@@ -432,6 +434,25 @@ export class AsanaClientWrapper {
 
   async deleteTask(taskId: string) {
     const response = await this.tasks.deleteTask(taskId);
+    return response.data;
+  }
+
+  async addTaskToSection(sectionGid: string, taskGid: string, insertBefore?: string, insertAfter?: string) {
+    const body: any = {
+      data: {
+        task: taskGid
+      }
+    };
+
+    // Add optional positioning parameters if provided
+    if (insertBefore) {
+      body.data.insert_before = insertBefore;
+    }
+    if (insertAfter) {
+      body.data.insert_after = insertAfter;
+    }
+
+    const response = await this.sections.addTaskForSection(body, sectionGid);
     return response.data;
   }
 }
